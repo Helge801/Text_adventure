@@ -1,5 +1,5 @@
 require 'colorize'
-
+$message
 
 # 0 = wall
 # 1 = space
@@ -24,6 +24,7 @@ row_13 = [0,1,1,1,1,1,1,1,1,1,1,0]
 row_14 = [0,1,3,1,1,1,1,1,1,3,1,0]
 row_15 = [0,1,1,1,1,4,1,1,1,1,1,0]
 row_12 = [0,0,0,0,0,0,0,0,0,0,0,0]
+
 
 $board = [
 row_1,
@@ -177,19 +178,28 @@ def print_board
     row_string = ""
     r.each do |s|
       case s
-      when 0 then row_string += " #{s} ".colorize(:color => :black, :background => :black)
+      when 0 then row_string += "   ".colorize(:color => :black, :background => :black)
       when 1 then row_string += "   "
-      when 2 then row_string += " #{s} ".colorize(:color => :yellow, :background => :yellow)
-      when 3 then row_string += " #{s} ".colorize(:color => :blue, :background => :blue)
-      when 4 then row_string += " #{s} ".colorize(:color => :red, :background => :red)
-      when 5 then row_string += " #{s} ".colorize(:color => :light_blue, :background => :light_blue)
-      when 6 then row_string += " #{s} ".colorize(:color => :green, :background => :green)
+      when 2 then row_string += " A ".colorize(:color => :black, :background => :yellow)
+      when 3 then row_string += " W ".colorize(:color => :white, :background => :blue)
+      when 4 then row_string += " P ".colorize(:color => :white, :background => :red)
+      when 5 then row_string += " B ".colorize(:color => :white, :background => :light_blue)
+      when 6 then row_string += " S ".colorize(:color => :black, :background => :green)
       else
-        row_string += " #{s} ".colorize(:color => :white, :background => :white)
+        row_string += " T ".colorize(:color => :black, :background => :white)
       end
     end
   puts row_string
   end
+end
+
+def mini_map
+  [5,5].
+end
+
+def messages
+  puts $message
+  $message = ""
 end
 
 # 0 = wall
@@ -216,40 +226,107 @@ class Player
     @position = get_position(:player)
     @armor = 0
     @weapons = 0
-    @super_weapon = 0
+    @super_weapon = false
     @direction = "north"
+  end
+
+  def stats
+    puts "Position = " + @position.to_s
+    puts "Armor = " + @armor.to_s
+    puts "Weapons = " + @weapons.to_s
+    puts "Super_weapon = " + @super_weapon.to_s
+    puts "Direction = " + @direction.to_s
   end
 
   def move
     case gets.chomp.downcase
-    when "w", "up", "north", "go up", "go north", "move up", "move north" then move_north
+      when "w", "up", "north", "go up", "go north", "move up", "move north" then move_north
+      when "s", "down", "south", "go down", "go south", "move down", "move south" then move_south
+      when "a", "left", "west", "go left", "go west", "move left", "move west" then move_west
+      when "d", "right", "east", "go right", "go east", "move right", "move east" then move_east
     end
   end
 
   private
 
   def move_north
-    handle_item $board[(self.position[0] - 1)][self.position[1]]
-    change_board self.position, 1
-    change_board [(self.position[0] - 1),self.position[1]], 4
-    @position = [(self.position[0] - 1),self.position[1]]
+    if handle_item $board[(self.position[0] - 1)][self.position[1]]
+      change_board self.position, 1
+      change_board [(self.position[0] - 1),self.position[1]], 4
+      @position = [(self.position[0] - 1),self.position[1]]
+      @direction = "north"
+    else
+      $message += "You cannot walk through walls"
+    end
   end
 
   def move_south
-
+    if handle_item $board[(self.position[0] + 1)][self.position[1]]
+    change_board self.position, 1
+    change_board [(self.position[0] + 1),self.position[1]], 4
+    @position = [(self.position[0] + 1),self.position[1]]
+    @direction = "south"
+    else
+      $message += "You cannot walk through walls"
+    end
   end
 
   def move_west
-
+    if handle_item $board[self.position[0]][(self.position[1] - 1)]
+    change_board self.position, 1
+    change_board [self.position[0],(self.position[1] - 1)], 4
+    @position = [self.position[0],(self.position[1] - 1)]
+    @direction = "west"
+    else
+      $message += "You cannot walk through walls"
+    end
   end
 
   def move_east
-
+    if handle_item $board[self.position[0]][(self.position[1] + 1)]
+    change_board self.position, 1
+    change_board [self.position[0],(self.position[1] + 1)], 4
+    @position = [self.position[0],(self.position[1] + 1)]
+    @direction = "east"
+    else
+      $message += "You cannot walk through walls"
+    end
   end
 
   def handle_item item
-    p "item is #{item}"
+    case item
+      when 0 then return false
+      when 1 then
+      when 2 then gain_armor
+      when 3 then gain_weapon
+      when 4 then p "some how you found your own self"
+      when 5 then meet_beast
+      when 6 then gain_super
+      when 7 then fall_in_trap
+    end
+    true
   end
+
+  def gain_armor
+    $message += "you gained 1 armor \n"
+  end
+
+  def gain_weapon
+    $message += "you gained 1 weapon \n"
+  end
+
+  def meet_beast
+    $message += "you met the Beast! \n"
+  end
+
+  def gain_super
+    $message += "you gained the SUPER WEAPON \n"
+  end
+
+  def fall_in_trap
+    $message += "you fell in a trap \n"
+  end
+
 end
 
 class Beast
@@ -301,9 +378,13 @@ puts narative("You wake to find yourself in complete darknes. The smell of stagn
 # what_can_i_do $player
 
 loop do
+  system "clear"
   print_board
-  explain_what_i_see $player
-  what_can_i_do $player
+  $player.stats
+  messages
+
+  # explain_what_i_see $player
+  # what_can_i_do $player
   $player.move
 end
 
