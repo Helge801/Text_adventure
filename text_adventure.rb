@@ -1,5 +1,5 @@
 require 'colorize'
-$message
+$message = ""
 
 # 0 = wall
 # 1 = space
@@ -9,24 +9,27 @@ $message
 # 5 = beast
 # 6 = super_weapon
 # 7 = trap
-row_1 = [0,0,0,0,0,0,0,0,0,0,0,0]
-row_2 = [0,6,1,1,1,0,1,1,1,1,5,0]
-row_3 = [0,1,1,1,1,0,1,1,1,1,1,0]
-row_4 = [0,1,1,1,1,0,1,1,1,1,1,0]
-row_5 = [0,1,1,1,1,1,1,1,0,1,1,0]
-row_6 = [0,0,0,1,1,1,1,1,1,1,1,0]
-row_7 = [0,0,0,1,1,1,1,1,1,1,1,0]
-row_8 = [0,1,1,1,7,7,7,1,1,1,1,0]
-row_9 = [0,1,1,1,1,2,1,1,1,1,1,0]
-row_10 = [0,1,1,1,2,1,1,1,1,1,1,0]
-row_11 = [0,1,1,1,1,1,1,0,0,0,0,0]
-row_13 = [0,1,1,1,1,1,1,1,1,1,1,0]
-row_14 = [0,1,3,1,1,1,1,1,1,3,1,0]
-row_15 = [0,1,1,1,1,4,1,1,1,1,1,0]
-row_12 = [0,0,0,0,0,0,0,0,0,0,0,0]
+row_0 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+row_1 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+row_2 = [0,0,6,1,1,1,0,1,1,1,1,5,0,0]
+row_3 = [0,0,1,1,1,1,0,1,1,1,1,1,0,0]
+row_4 = [0,0,1,1,1,1,0,1,1,1,1,1,0,0]
+row_5 = [0,0,1,1,1,1,1,1,1,0,1,1,0,0]
+row_6 = [0,0,0,0,1,1,1,1,1,1,1,1,0,0]
+row_7 = [0,0,0,0,1,1,1,1,1,1,1,1,0,0]
+row_8 = [0,0,1,1,1,7,7,7,1,1,1,1,0,0]
+row_9 = [0,0,1,1,1,1,2,1,1,1,1,1,0,0]
+row_10 = [0,0,1,1,1,2,1,1,1,1,1,1,0,0]
+row_11 = [0,0,1,1,1,1,1,1,0,0,0,0,0,0]
+row_12 = [0,0,1,1,1,1,1,1,1,1,1,1,0,0]
+row_13 = [0,0,1,3,1,1,1,1,1,1,3,1,0,0]
+row_14 = [0,0,1,1,1,1,4,1,1,1,1,1,0,0]
+row_15 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+row_16 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 $board = [
+row_0,
 row_1,
 row_2,
 row_3, 
@@ -38,10 +41,11 @@ row_8,
 row_9, 
 row_10,
 row_11,
+row_12,
 row_13,
 row_14,
 row_15,
-row_12
+row_16
 ]
 
 # map = {}
@@ -193,8 +197,75 @@ def print_board
   end
 end
 
+def get_it position
+  case $board[position[0]][position[1]]
+    when 0 then dot_string = "   ".colorize(:color => :black, :background => :black)
+    when 1 then dot_string = "   ".colorize(:color => :white, :background => :white)
+    when 2 then dot_string = " A ".colorize(:color => :black, :background => :yellow)
+    when 3 then dot_string = " W ".colorize(:color => :white, :background => :blue)
+    when 4 then dot_string = " P ".colorize(:color => :white, :background => :red)
+    when 5 then dot_string = " B ".colorize(:color => :white, :background => :light_blue)
+    when 6 then dot_string = " S ".colorize(:color => :black, :background => :green)
+    else
+      dot_string = " T ".colorize(:color => :white, :background => :grey)
+  end
+  dot_string
+end
+
 def mini_map
-  [5,5].
+  loc = $player.position
+  p a_offset = loc[0] - 2
+  p b_offset = loc[1] - 2
+  location_list = []
+  mini_string = ""
+  5.times do |a|
+    5.times do |b|
+      location_list.push([(a + a_offset),(b + b_offset)])
+    end
+  end
+  location_list[0..4].each {|s| mini_string += get_it(s)}
+  print mini_string + "\n"
+  mini_string = ""
+  location_list[5..9].each {|s| mini_string += get_it(s)}
+  print mini_string + "\n"
+  mini_string = ""
+  location_list[10..14].each {|s| mini_string += get_it(s)}
+  print mini_string + "\n"
+  mini_string = ""
+  location_list[15..19].each {|s| mini_string += get_it(s)}
+  print mini_string + "\n"
+  mini_string = ""
+  location_list[20..24].each {|s| mini_string += get_it(s)}
+  print mini_string + "\n"
+end
+
+def micro_map
+  loc = $player.position
+  p a_offset = loc[0] - 1
+  p b_offset = loc[1] - 1
+  location_list = []
+  mini_string = ""
+  3.times do |a|
+    3.times do |b|
+      location_list.push([(a + a_offset),(b + b_offset)])
+    end
+  end
+  location_list[0..2].each {|s| mini_string += get_it(s)}
+  print mini_string + "\n"
+  mini_string = ""
+  location_list[3..5].each {|s| mini_string += get_it(s)}
+  print mini_string + "\n"
+  mini_string = ""
+  location_list[6..8].each {|s| mini_string += get_it(s)}
+  print mini_string + "\n"
+end
+
+def map
+  if $player.super_weapon
+    mini_map
+  else
+    micro_map
+  end
 end
 
 def messages
@@ -231,10 +302,10 @@ class Player
   end
 
   def stats
-    puts "Position = " + @position.to_s
+    # puts "Position = " + @position.to_s
     puts "Armor = " + @armor.to_s
-    puts "Weapons = " + @weapons.to_s
-    puts "Super_weapon = " + @super_weapon.to_s
+    puts "Weapons = " + @weapons.to_s unless @super_weapon
+    puts ("Weapon = " + "fire sword".colorize(:red)) if @super_weapon
     puts "Direction = " + @direction.to_s
   end
 
@@ -308,7 +379,13 @@ class Player
   end
 
   def gain_armor
-    $message += "you gained 1 armor \n"
+    if @armor < 1
+      $message += "You find a something on the ground. Your in luck!\nIt's a peice of armor, a breast plate.\nJudging by the scratches and blood on it, \nit doesn't look like it was enough to save the last person who wore it!".colorize(:yellow) + "\n "
+      @armor += 1
+    else
+      $message += "You find another peice of armor. This time a helmet!\n This will come in handy if you ever find the source of that noise!".colorize(:yellow) + "\n "
+      @armor += 1
+    end
   end
 
   def gain_weapon
@@ -320,7 +397,8 @@ class Player
   end
 
   def gain_super
-    $message += "you gained the SUPER WEAPON \n"
+    $message += "You found a burning sword, Luckily the handle is somehow still cold to the touch. As you pisck it up you gain such a sense of assurance. Nothing can defeat you now! The light from the sword extends your vision! \n"
+    @super_weapon = true
   end
 
   def fall_in_trap
@@ -361,8 +439,10 @@ puts "beast is #{get_moves_away($player, $beast)} moves away from player".colori
 # ==================== Tests ==================== #
 
 # ==================== Intro ==================== #
-
+system "clear"
 puts narative("You wake to find yourself in complete darknes. The smell of stagnent water and dirt fills the air. \n After a moment your eyes adjust and you realize you can see, but only a few feet. \n Suddenly you hear a ") + danger("snarl") + narative(" in the not so far distance...\n You are not alone!")
+puts "Press ENTER to continue"
+gets
 
 # ==================== Intro ==================== #
 
@@ -379,7 +459,9 @@ puts narative("You wake to find yourself in complete darknes. The smell of stagn
 
 loop do
   system "clear"
-  print_board
+  # print_board
+  # mini_map
+  map
   $player.stats
   messages
 
